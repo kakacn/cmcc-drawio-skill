@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>CMCC 横向流程图</title>
+<style>
+  :root{
+    --cm:#008FD7;
+    --cm-deep:#0067AC;
+    --cm-dark:#0A3D66;
+    --cm-ink:#33566E;
+    --cm-mute:#6B8CA3;
+    --cm-line:#C9E2F2;
+    --warn:#F39800;
+    --sans:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .sheet{
+    width:2000px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#F0F8FE 0%,#FFFFFF 60%);
+    color:var(--cm-dark);
+  }
+  .band{position:absolute;top:0;left:0;right:0;height:128px;
+    background:linear-gradient(100deg,#0AA5E2 0%,#0078BE 55%,#005E9C 100%)}
+  .band svg{position:absolute;bottom:-1px;left:0}
+  .band-title{position:absolute;left:56px;top:30px;color:#fff}
+  .band-title h1{font-size:31px;font-weight:800;letter-spacing:.1em}
+  .band-title p{margin-top:10px;font-size:13.5px;color:rgba(255,255,255,.85);letter-spacing:.14em}
+  .band-legend{position:absolute;right:56px;top:44px;display:flex;gap:26px;
+    font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.08em}
+  .band-legend span{display:inline-flex;align-items:center;gap:9px}
+  .lg-solid{width:36px;height:0;border-top:3px solid #fff;border-radius:2px}
+  .lg-dash{width:36px;height:0;border-top:3px dashed var(--warn)}
+  .lg-dia{width:13px;height:13px;border:2px solid #fff;transform:rotate(45deg);border-radius:2px}
+  .deco-circle{position:absolute;border-radius:50%;background:rgba(255,255,255,.10)}
+  .row{position:absolute;left:40px;right:40px;top:196px;display:flex;gap:45px;z-index:1}
+  .card{flex:1;height:196px;position:relative;background:#fff;
+    border:1px solid var(--cm-line);border-radius:14px;
+    box-shadow:0 8px 20px rgba(0,103,172,.10);padding:16px 16px 12px}
+  .card::before{content:"";position:absolute;top:0;left:14px;right:14px;height:4px;
+    background:linear-gradient(90deg,#0AA5E2,#005E9C);border-radius:0 0 4px 4px}
+  .chip{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;
+    padding:0 6px;border-radius:10px;background:linear-gradient(135deg,#12A6E4,#0067AC);
+    color:#fff;font-size:19px;font-weight:800}
+  .card h3{display:inline-block;vertical-align:middle;margin-left:10px;font-size:16.5px;
+    font-weight:800;color:var(--cm-dark);letter-spacing:.06em}
+  .head{display:flex;align-items:center}
+  .divider{height:1px;background:var(--cm-line);margin:12px 0 10px}
+  .card p{font-size:11.8px;line-height:1.7;color:var(--cm-ink)}
+  .card.end{background:linear-gradient(150deg,#0AA5E2,#005E9C);border-color:transparent;
+    box-shadow:0 10px 24px rgba(0,94,156,.35)}
+  .card.end::before{background:rgba(255,255,255,.45)}
+  .card.end h3{color:#fff}
+  .card.end p{color:rgba(255,255,255,.9)}
+  .card.end .divider{background:rgba(255,255,255,.3)}
+  .card.end .chip{background:#fff;color:var(--cm-deep)}
+  .end-flag{position:absolute;top:-12px;right:14px;background:var(--warn);color:#fff;
+    font-size:11px;font-weight:700;letter-spacing:.2em;padding:3px 10px;border-radius:20px}
+  .pt{position:absolute;width:2px;height:2px}
+  .pt-l{left:-1px;top:50%;margin-top:-1px}
+  .pt-r{right:-1px;top:50%;margin-top:-1px}
+  .pt-b{bottom:-1px;left:50%;margin-left:-1px}
+  .pt-t{top:-1px;left:50%;margin-left:-1px}
+  .diamond-wrap{position:absolute;width:150px;height:150px;top:448px;z-index:1}
+  .diamond-wrap .pt-t{top:calc(50% - 63px);left:50%;margin:-1px 0 0 -1px}
+  .diamond-wrap .pt-b{top:calc(50% + 63px);left:50%;margin:-1px 0 0 -1px}
+  .diamond-wrap .pt-l{left:calc(50% - 63px);top:50%;margin:-1px 0 0 -1px}
+  .diamond-wrap .pt-r{left:calc(50% + 63px);top:50%;margin:-1px 0 0 -1px}
+  .diamond{position:absolute;inset:27px;background:#fff;border:2px solid var(--cm);
+    border-radius:8px;transform:rotate(45deg);box-shadow:0 6px 16px rgba(0,103,172,.15)}
+  .diamond span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    transform:rotate(-45deg);text-align:center;font-size:13px;font-weight:800;
+    color:var(--cm-dark);line-height:1.5;letter-spacing:.05em}
+  #wires text{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.06em;
+    paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+  .foot{position:absolute;left:56px;right:56px;bottom:26px;display:flex;justify-content:space-between;
+    font-size:11.5px;color:var(--cm-mute);letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="sheet" id="sheet">
+  <div class="band">
+    <svg width="2000" height="34" viewBox="0 0 2000 34" preserveAspectRatio="none">
+      <path d="M0 20 C 300 2, 520 34, 840 16 S 1420 0, 2000 18 L2000 34 L0 34 Z" fill="rgba(255,255,255,.18)"/>
+      <path d="M0 26 C 360 10, 700 34, 1080 20 S 1600 6, 2000 24 L2000 34 L0 34 Z" fill="rgba(255,255,255,.28)"/>
+    </svg>
+    <div class="deco-circle" style="width:220px;height:220px;right:280px;top:-130px"></div>
+    <div class="deco-circle" style="width:120px;height:120px;right:170px;top:30px"></div>
+    <div class="band-title"><h1 id="cfg-title"></h1><p id="cfg-subtitle"></p></div>
+    <div class="band-legend" id="cfg-legend"></div>
+  </div>
+  <svg id="wires" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible" aria-hidden="true">
+    <defs>
+      <marker id="aBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#008FD7"/></marker>
+      <marker id="aWarn" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F39800"/></marker>
+    </defs>
+  </svg>
+  <div class="row" id="row"></div>
+  <div class="foot"><div id="cfg-footL"></div><div id="cfg-footR"></div></div>
+</div>
+
+<script>
+/* ═══════════ 配置区：修改此处即可复用 ═══════════ */
+var CONFIG = {
+  title: "中国移动基层工会预算编制与审批流程图",   // 命名规范：中国移动基层工会{流程名称}流程图
+  subtitle: "编制 · 审查 · 审批 · 备案　——　八步闭环，审议未通过退回修订",
+  footerLeft: "依据：中国移动基层工会工作标准化手册（工会经费管理模块）",
+  footerRight: "",   // 手册版式无右侧页脚，留空即可
+  legend: true,
+  steps: [
+    { title: "编制准备", desc: "每年第四季度，上级工会下发下年度预算编制通知，各基层工会启动编制工作。" },
+    { title: "收入测算", desc: "结合会员规模、职工工资总额、上级工会补助政策，科学测算各项预算收入。" },
+    { title: "支出编制", desc: "围绕年度工作计划与重点任务，按支出范围与开支标准，细化至具体项目。" },
+    { title: "草案形成", desc: "汇总各项收支预算，形成本级工会年度收支预算草案。" },
+    { title: "经审委审查", desc: "预算草案提交本级工会经费审查委员会审查，出具审查意见。" },
+    { title: "党委报告",   desc: "经审委审查通过后，向本单位党委专题汇报，听取党委意见。" },
+    { title: "委员会审批", desc: "结合经审委审查意见与党委意见，工会委员会集体审议审批。" },
+    { title: "报上级备案", desc: "审议通过的正式预算，报送上级主管工会备案或报批。", terminal: true }
+  ],
+  // decisions: 在第 after 步（1 起计）之后插入判断菱形；是→继续，否→虚线退回 returnTo 步
+  decisions: [
+    { after: 5, question: "审查\n通过？", returnTo: 4, label: "否 · 退回修订草案" },
+    { after: 7, question: "审批\n通过？", returnTo: 4, label: "否 · 退回修订草案" }
+  ]
+};
+/* ═══════════ 渲染引擎（一般无需修改） ═══════════ */
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var sheet=document.getElementById('sheet'), row=document.getElementById('row'), svg=document.getElementById('wires');
+  document.getElementById('cfg-title').textContent=CONFIG.title;
+  document.getElementById('cfg-subtitle').textContent=CONFIG.subtitle;
+  document.getElementById('cfg-footL').textContent=CONFIG.footerLeft||'';
+  document.getElementById('cfg-footR').textContent=CONFIG.footerRight||'';
+  document.getElementById('cfg-legend').style.display=CONFIG.legend?'flex':'none';
+  if(CONFIG.legend){
+    document.getElementById('cfg-legend').innerHTML=
+      '<span><i class="lg-solid"></i>主流程</span><span><i class="lg-dash"></i>退回修订</span><span><i class="lg-dia"></i>审议判断</span>';
+  }
+  var n=CONFIG.steps.length, afterSet={}, decByStep={};
+  CONFIG.decisions.forEach(function(d,i){
+    if(d.after<1||d.after>=n)console.warn('decision.after 必须在 1..steps.length-1 之间');
+    afterSet[d.after]=d; decByStep[d.after]=i;
+  });
+  // 卡片
+  var cards=[];
+  CONFIG.steps.forEach(function(s,i){
+    var c=document.createElement('div');
+    c.className='card'+(s.terminal?' end':'');
+    c.id='c'+(i+1);
+    var anchors='<i class="pt pt-b"></i>';
+    if(i>0)anchors+='<i class="pt pt-l"></i>';
+    if(i<n-1)anchors+='<i class="pt pt-r"></i>';
+    c.innerHTML=anchors+
+      (s.terminal?'<span class="end-flag">END</span>':'')+
+      '<div class="head"><span class="chip">'+String(i+1).padStart(2,'0')+'</span><h3>'+s.title+'</h3></div>'+
+      '<div class="divider"></div><p>'+s.desc+'</p>';
+    row.appendChild(c); cards.push(c);
+  });
+  // 菱形
+  var wraps={};
+  CONFIG.decisions.forEach(function(d,i){
+    var w=document.createElement('div');
+    w.className='diamond-wrap'; w.id='d'+(i+1);
+    w.innerHTML='<i class="pt pt-t"></i><i class="pt pt-b"></i><i class="pt pt-l"></i><i class="pt pt-r"></i>'+
+      '<div class="diamond"><span>'+d.question.replace(/\n/g,'<br>')+'</span></div>';
+    sheet.appendChild(w); wraps[d.after]=w;
+  });
+  function pt(sel){var el=document.querySelector(sel);var r=el.getBoundingClientRect();var c=sheet.getBoundingClientRect();
+    return {x:r.left-c.left+r.width/2,y:r.top-c.top+r.height/2}}
+  function center(el){var r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
+  function add(d,color,dash,marker){var p=document.createElementNS(NS,'path');p.setAttribute('class','wire');
+    p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke',color);
+    p.setAttribute('stroke-width','3');if(dash)p.setAttribute('stroke-dasharray',dash);
+    p.setAttribute('marker-end',marker);svg.appendChild(p)}
+  function label(x,y,text,color){var t=document.createElementNS(NS,'text');t.setAttribute('class','wlabel');
+    t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('fill',color);t.textContent=text;svg.appendChild(t)}
+  function wire(fSel,tSel){var f=pt(fSel),t=pt(tSel);
+    add('M '+f.x+' '+f.y+' L '+t.x+' '+(t.y-1),'#008FD7',null,'url(#aBlue)')}
+  var BUS0=700, BUSGAP=96;
+  function draw(){
+    // 对齐菱形
+    CONFIG.decisions.forEach(function(d,i){
+      var cx=center(document.getElementById('c'+d.after));
+      document.getElementById('d'+(i+1)).style.left=(cx.x-75-sheet.getBoundingClientRect().left)+'px';
+    });
+    var nd=CONFIG.decisions.length;
+    var H=nd>0?BUS0+(nd-1)*BUSGAP+150:620;
+    sheet.style.height=H+'px';
+    svg.setAttribute('viewBox','0 0 2000 '+H);
+    var olds=svg.querySelectorAll('path.wire,text.wlabel');for(var i=0;i<olds.length;i++)olds[i].remove();
+    // 主流程横向箭头（被决策节点截断处跳过）
+    for(var i=1;i<n;i++){
+      if(afterSet[i])continue;
+      wire('#c'+i+' .pt-r','#c'+(i+1)+' .pt-l');
+    }
+    // 决策节点连线
+    CONFIG.decisions.forEach(function(d,i){
+      var di=i+1;
+      wire('#c'+d.after+' .pt-b','#d'+di+' .pt-t');
+      var f=pt('#d'+di+' .pt-r'), t=pt('#c'+(d.after+1)+' .pt-b');
+      add('M '+f.x+' '+f.y+' H '+t.x+' V '+(t.y-1),'#008FD7',null,'url(#aBlue)');
+      label(f.x+14,f.y+5,'是','#008FD7');
+      // 退回总线：多条时左右错开
+      var off=(i-(nd-1)/2)*32;
+      var busY=BUS0+i*BUSGAP;
+      var fb=pt('#d'+di+' .pt-b'), tt=pt('#c'+d.returnTo+' .pt-b');
+      var tx=tt.x+off;
+      add('M '+fb.x+' '+fb.y+' V '+busY+' H '+tx+' V '+(tt.y-1),'#F39800','9 7','url(#aWarn)');
+      label(tx+16,busY-12,d.label||'否 · 退回修订','#F39800');
+    });
+  }
+  draw();
+  window.addEventListener('load',draw);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>
